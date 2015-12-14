@@ -1,6 +1,7 @@
 Table of Contents
 -------------------
 
+ * [Remark](#remark)
  * [Installation](#installation)
  * [Quick Start](#quick-start)
  * [Command-line arguments](#command-line-arguments) 
@@ -15,6 +16,16 @@ Table of Contents
  * [Logging](#logging) 
  * [Out of the box](#out-of-the-box) 
 
+Remark
+-------------------
+Based on https://github.com/romeOz/docker-mysql
+
+Difference:
+
+ Adapted for using with docker-compose:
+ * MYSQL_USER and MYSQL_RESTORE take effect only on database creation. So you can safely set these variables in `docker-compose.yml` and safely re-create container with persistent data.
+ 
+
 Installation
 -------------------
 
@@ -22,13 +33,13 @@ Installation
  * Pull the latest version of the image.
  
 ```bash
-docker pull romeoz/docker-mysql
+docker pull ruslangetmansky/docker-mysql
 ```
 
 Alternately you can build the image yourself.
 
 ```bash
-git clone https://github.com/romeoz/docker-mysql.git
+git clone https://github.com/ruslangetmansky/docker-mysql.git
 cd docker-mysql
 docker build -t="$USER/mysql" .
 ```
@@ -39,7 +50,7 @@ Quick Start
 Run the mysql image:
 
 ```bash
-docker run --name mysql -d romeoz/docker-mysql
+docker run --name mysql -d ruslangetmansky/docker-mysql
 ```
 
 The simplest way to login to the mysql container is to use the `docker exec` command to attach a new process to the running container and connect to the MySQL Server over the unix socket.
@@ -55,7 +66,7 @@ You can customize the launch command of mysql by specifying arguments to `mysqld
 
 ```bash
 docker run --name db -d \
-  romeoz/docker-mysql \
+  ruslangetmansky/docker-mysql \
   --lower_case_table_names=1
 ```
 
@@ -66,7 +77,7 @@ If you want to use a preset password instead of a random generated one, you can
 set the environment variable `MYSQL_PASS` to your specific password when running the container:
 
 ```bash
-docker run --name db -d -e 'MYSQL_PASS=mypass' romeoz/docker-mysql
+docker run --name db -d -e 'MYSQL_PASS=mypass' ruslangetmansky/docker-mysql
 ```
 
 You can now test your deployment:
@@ -87,7 +98,7 @@ for the first time you can set the environment variable `DB_NAME` to a string
 that names the database.
 
 ```bash
-docker run --name mysql -d  -e 'DB_NAME=dbname' romeoz/docker-mysql
+docker run --name mysql -d  -e 'DB_NAME=dbname' ruslangetmansky/docker-mysql
 ```
 
 You may also specify a comma separated list of database names in the `DB_NAME` variable. The following command creates two new databases named *dbname1* and *dbname2* (p.s. this feature is only available in releases greater than 9.1-1).
@@ -95,7 +106,7 @@ You may also specify a comma separated list of database names in the `DB_NAME` v
 ```bash
 docker run --name mysql -d \
   -e 'DB_NAME=dbname1,dbname2' \
-  romeoz/docker-mysql
+  ruslangetmansky/docker-mysql
 ```
 
 If this is combined with importing SQL files, those files will be imported into the
@@ -118,7 +129,7 @@ The updated run command looks like this.
 ```bash
 docker run --name mysql -d \
   -v /host/to/path/data:/var/lib/mysql \
-  romeoz/docker-mysql
+  ruslangetmansky/docker-mysql
 ```
 
 This will make sure that the data stored in the database is not lost when the image is stopped and started again.
@@ -136,7 +147,7 @@ docker run -it --rm \
     -e 'MYSQL_MODE=backup' \
     -e 'DB_REMOTE_HOST=mysql' -e 'DB_REMOTE_USER=admin' -e 'DB_REMOTE_PASS=pass' \
     -v /host/to/path/backup:/tmp/backup \
-    romeoz/docker-mysql
+    ruslangetmansky/docker-mysql
 ```
  
 Archive will be available in the `/host/to/path/backup`.
@@ -151,7 +162,7 @@ docker run -it --rm \
     -e 'MYSQL_MODE=backup' \    
     -e 'DB_REMOTE_HOST=mysql' -e 'DB_REMOTE_USER=admin' -e 'DB_REMOTE_PASS=pass' \
     -v /host/to/path/backup:/tmp/backup \    
-    romeoz/docker-mysql \
+    ruslangetmansky/docker-mysql \
     --master-data --single-transaction
 ```
 
@@ -165,7 +176,7 @@ docker run -it --rm \
     -e 'MYSQL_CHECK=default' \
     -e 'DB_NAME=foo' \
     -v /host/to/path/backup:/tmp/backup \
-    romeoz/docker-mysql
+    ruslangetmansky/docker-mysql
 ```
 
 Default used the `/tmp/backup/backup.last.bz2`.
@@ -177,7 +188,7 @@ Restore from backup
 docker run --name='db_restore' -d \
   -e 'MYSQL_RESTORE=default' \
   -v /host/to/path/backup:/tmp/backup \
-  romeoz/docker-mysql
+  ruslangetmansky/docker-mysql
 ```
 
 Also see ["Replication"](replication---masterslave).
@@ -196,7 +207,7 @@ docker run --name='mysql-master' -d \
   -e 'MYSQL_MODE=master' \
   -e 'DB_NAME=dbname' \
   -e 'MYSQL_USER=dbuser' -e 'MYSQL_PASS=dbpass' \
-  romeoz/docker-mysql
+  ruslangetmansky/docker-mysql
 ```
 
 or import backup
@@ -207,7 +218,7 @@ docker run --name='mysql-master' -d \
   -e 'MYSQL_RESTORE=/tmp/backup/backup.last.bz2' \
   -e 'MYSQL_USER=dbuser' -e 'MYSQL_PASS=dbpass' \
   -v /host/to/path/backup:/tmp/backup \
-  romeoz/docker-mysql
+  ruslangetmansky/docker-mysql
 ```
 
 Create a slave instance + fast import backup from master
@@ -218,7 +229,7 @@ docker run --name='mysql-slave' -d  \
   -e 'MYSQL_MODE=slave' -e 'MYSQL_PASS=pass' \
   -e 'REPLICATION_HOST=mysql-master' \
   -e 'DB_REMOTE_USER=dbuser' -e 'DB_REMOTE_PASS=dbpass' \
-  romeoz/docker-mysql
+  ruslangetmansky/docker-mysql
 ```
 
 Variables `DB_REMOTE_USER` and `DB_REMOTE_PASS` is master settings. 
@@ -232,7 +243,7 @@ docker run --name='mysql-slave' -d  \
   -e 'REPLICATION_HOST=mysql-master' \
   -e 'MYSQL_RESTORE=/tmp/backup/backup.last.bz2' \
   -v /host/to/path/backup:/tmp/backup \
-  romeoz/docker-mysql
+  ruslangetmansky/docker-mysql
 ```
 
 >Protection against unauthorized inserting records `docker exec -it mysql-slave mysql -uroot -e 'GRANT SELECT ON *.* TO "web"@"%" WITH GRANT OPTION;'`
