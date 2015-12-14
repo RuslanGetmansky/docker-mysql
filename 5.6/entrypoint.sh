@@ -243,13 +243,14 @@ if [[ -z ${1} ]]; then
     if [ -f /tmp/.EMPTY_DB ]; then
         create_mysql_user
         create_db
-        rm /tmp/.EMPTY_DB
-    fi
 
-    # Restore form backup
-    if [[ -n ${MYSQL_RESTORE} && ${MYSQL_MODE} != slave ]]; then
-        echo "Import dump..."
-        import_backup "${MYSQL_RESTORE}"
+        # Restore form backup
+        if [[ -n ${MYSQL_RESTORE} && ${MYSQL_MODE} != slave ]]; then
+            echo "Import dump..."
+            import_backup "${MYSQL_RESTORE}"
+        fi
+
+        rm /tmp/.EMPTY_DB
     fi
 
     # Set MySQL REPLICATION - MASTER

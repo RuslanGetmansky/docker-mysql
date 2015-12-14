@@ -26,8 +26,7 @@ COPY mysqld_charset.cnf /etc/mysql/conf.d/mysqld_charset.cnf
 RUN apt-get update \
     && apt-get -yq install mysql-server-5.5 mysql-client-5.5 lbzip2 \
     && rm -rf /var/lib/apt/lists/* \
-    && rm /etc/mysql/conf.d/mysqld_safe_syslog.cnf \
-    && touch /tmp/.EMPTY_DB
+    && rm /etc/mysql/conf.d/mysqld_safe_syslog.cnf
 
 COPY entrypoint.sh /sbin/entrypoint.sh
 RUN chmod 755 /sbin/entrypoint.sh
